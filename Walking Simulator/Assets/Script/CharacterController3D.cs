@@ -3,6 +3,7 @@ using UnityEngine;
 public class CharacterController3D : MonoBehaviour
 {
     public float speed = 5.0f;
+    public float runMultiplier = 2.0f; // The multiplier for running speed
     public float jumpForce = 5.0f;
     public float sensitivity = 2.0f; // Mouse sensitivity for looking around
     public float maxYAngle = 80.0f; // Maximum vertical angle to look up and down
@@ -31,23 +32,28 @@ public class CharacterController3D : MonoBehaviour
 
     void Update()
     {
-        // Movement
+        // Prepare movement direction
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
-        Vector3 movement = new Vector3(horizontal, 0.0f, vertical) * speed * Time.deltaTime;
-        transform.Translate(movement);
+        Vector3 movementDirection = new Vector3(horizontal, 0.0f, vertical).normalized;
 
-        // Walking animation
-        bool isWalking = horizontal != 0 || vertical != 0;
-        animator.SetBool("Walk", isWalking);
+        // Determine if running
+        bool isRunning = Input.GetKey(KeyCode.LeftShift);
+        float currentSpeed = isRunning ? speed * runMultiplier : speed;
+
+        // Walking and running animation
+        bool isMoving = movementDirection.magnitude > 0;
+        animator.SetBool("Walk", isMoving);
+        // Optionally, add a separate running animation if available
+        // animator.SetBool("Run", isMoving && isRunning);
 
         // Play walking sound
-        if (isWalking && !audioSource.isPlaying)
+        if (isMoving && !audioSource.isPlaying)
         {
             audioSource.clip = walkingSound;
             audioSource.Play();
         }
-        else if (!isWalking)
+        else if (!isMoving)
         {
             audioSource.Stop();
         }
@@ -76,13 +82,29 @@ public class CharacterController3D : MonoBehaviour
             animator.SetTrigger("Jab");
         }
 
-        // Rotate character with A and D keys
+        // Rotate character with mouse movement
         transform.Rotate(Vector3.up, Input.GetAxis("Mouse X") * sensitivity);
 
         // Rotate camera vertically
         rotationX -= Input.GetAxis("Mouse Y") * sensitivity;
         rotationX = Mathf.Clamp(rotationX, -maxYAngle, maxYAngle);
         Camera.main.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+    }
+
+    void FixedUpdate()
+    {
+        // Movement using Rigidbody for collision detection
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
+        Vector3 movementDirection = new Vector3(horizontal, 0.0f, vertical).normalized;
+        bool isRunning = Input.GetKey(KeyCode.LeftShift);
+        float currentSpeed = isRunning ? speed * runMultiplier : speed;
+
+        if (movementDirection.magnitude > 0)
+        {
+            Vector3 movement = transform.TransformDirection(movementDirection) * currentSpeed * Time.fixedDeltaTime;
+            rb.MovePosition(rb.position + movement);
+        }
     }
 
     // Check if the character is grounded
