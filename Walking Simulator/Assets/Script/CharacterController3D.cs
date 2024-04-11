@@ -4,16 +4,20 @@ public class CharacterController3D : MonoBehaviour
 {
     public float speed = 5.0f;
     public float jumpForce = 5.0f;
+    public float sensitivity = 2.0f; // Mouse sensitivity for looking around
+    public float maxYAngle = 80.0f; // Maximum vertical angle to look up and down
+
     private Rigidbody rb;
     private Animator animator;
     private bool isGrounded;
-    private bool rotateLeft;
-    private bool rotateRight;
+    private float rotationX = 0; // Current rotation around the x-axis (pitch)
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
+        Cursor.lockState = CursorLockMode.Locked; // Lock cursor to the center of the screen
+        Cursor.visible = false; // Hide cursor
     }
 
     void Update()
@@ -48,35 +52,12 @@ public class CharacterController3D : MonoBehaviour
         }
 
         // Rotate character with A and D keys
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            rotateLeft = true;
-        }
+        transform.Rotate(Vector3.up, Input.GetAxis("Mouse X") * sensitivity);
 
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            rotateRight = true;
-        }
-
-        if (Input.GetKeyUp(KeyCode.A))
-        {
-            rotateLeft = false;
-        }
-
-        if (Input.GetKeyUp(KeyCode.D))
-        {
-            rotateRight = false;
-        }
-
-        if (rotateLeft)
-        {
-            transform.Rotate(Vector3.up, -50 * Time.deltaTime);
-        }
-
-        if (rotateRight)
-        {
-            transform.Rotate(Vector3.up, 50 * Time.deltaTime);
-        }
+        // Rotate camera vertically
+        rotationX -= Input.GetAxis("Mouse Y") * sensitivity;
+        rotationX = Mathf.Clamp(rotationX, -maxYAngle, maxYAngle);
+        Camera.main.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
     }
 
     // Check if the character is grounded
