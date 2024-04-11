@@ -592,7 +592,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8a145074893f83d448b48f2c27eb571a, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.11
+      value: -0.505
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 8a145074893f83d448b48f2c27eb571a, type: 3}
       propertyPath: m_LocalPosition.z
@@ -679,6 +679,8 @@ MonoBehaviour:
   jumpForce: 5
   sensitivity: 2
   maxYAngle: 80
+  jumpSound: {fileID: 8300000, guid: 11cc82c4daa9f304dbbfab62c9207608, type: 3}
+  walkingSound: {fileID: 8300000, guid: 44e59b73420f0e64fb30e755c49b3823, type: 3}
 --- !u!136 &778684664
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -699,9 +701,9 @@ CapsuleCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5
-  m_Height: 2.3361435
+  m_Height: 1.8850083
   m_Direction: 1
-  m_Center: {x: 0, y: 0.66807175, z: 0}
+  m_Center: {x: 0, y: 0.8936393, z: 0}
 --- !u!54 &778684665
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -727,7 +729,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!95 &778684666
 Animator:
@@ -745,7 +747,13 @@ Animator:
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
-  m_WarningMessage: 
+  m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
+    are already bound by a Humanoid avatar. These transforms can only be changed
+    by Humanoid clips.\n\tTransform 'Hips'\n\tTransform 'LeftHandRing1'\n\tTransform
+    'RightHandThumb2'\n\tTransform 'RightArm'\n\tTransform 'RightForeArm'\n\tTransform
+    'LeftHandPinky2'\n\tTransform 'RightHandIndex1'\n\tTransform 'LeftHandThumb1'\n\tTransform
+    'LeftHandMiddle1'\n\tTransform 'LeftShoulder'\n\tand more ...\n\tFrom animation
+    clip 'Crouching Idle'"
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
@@ -1138,6 +1146,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f9fbed251850b5445ac44a9b93b592b8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  isInteractable: 1
+  isHidden: 0
+  useCustomMessage: 0
+  customMessage: Press E to interact
+  limitedInteractions: 0
+  maxInteractions: 1
+  onInteract:
+    m_PersistentCalls:
+      m_Calls: []
+  onReachedMaxInteractions:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &994138355 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -208595431880416365, guid: 4df1eceb10673d849a4f2100a05dab96, type: 3}
