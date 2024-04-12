@@ -55,7 +55,7 @@ public class CharacterController3D : MonoBehaviour
 
         bool isMoving = movementDirection.magnitude > 0;
         animator.SetBool("Walk", isMoving && !isRunning);
-        animator.SetBool("Run", isRunning && isMoving); // Optional: add running animation
+        //animator.SetBool("Run", isRunning && isMoving); // Optional: add running animation
 
         // Handle walking and running sounds
         if (isMoving && !audioSource.isPlaying)
