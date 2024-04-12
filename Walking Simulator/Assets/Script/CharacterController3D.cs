@@ -15,39 +15,46 @@ public class CharacterController3D : MonoBehaviour
     private bool isGrounded;
     private float rotationX = 0; // Current rotation around the x-axis (pitch)
     private AudioSource audioSource;
+    public float collisionCheckDistance = 0.5f; // Distance to check for collision ahead
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
-        Cursor.lockState = CursorLockMode.Locked; // Lock cursor to the center of the screen
-        Cursor.visible = false; // Hide cursor
-
-        // Add AudioSource component and configure
         audioSource = gameObject.AddComponent<AudioSource>();
         audioSource.playOnAwake = false;
-        audioSource.spatialBlend = 1.0f; // 3D sound
-        audioSource.volume = 0.5f; // Adjust volume if needed
+        audioSource.spatialBlend = 1.0f;
+        audioSource.volume = 0.5f;
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void Update()
     {
-        // Prepare movement direction
+        HandleMovement();
+        HandleJump();
+        HandleCombat();
+        HandleRotation();
+    }
+
+    void FixedUpdate()
+    {
+        PerformMovement();
+    }
+
+    private void HandleMovement()
+    {
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
         Vector3 movementDirection = new Vector3(horizontal, 0.0f, vertical).normalized;
 
-        // Determine if running
         bool isRunning = Input.GetKey(KeyCode.LeftShift);
         float currentSpeed = isRunning ? speed * runMultiplier : speed;
 
-        // Walking and running animation
         bool isMoving = movementDirection.magnitude > 0;
         animator.SetBool("Walk", isMoving);
-        // Optionally, add a separate running animation if available
-        // animator.SetBool("Run", isMoving && isRunning);
 
-        // Play walking sound
         if (isMoving && !audioSource.isPlaying)
         {
             audioSource.clip = walkingSound;
@@ -57,43 +64,10 @@ public class CharacterController3D : MonoBehaviour
         {
             audioSource.Stop();
         }
-
-        // Jump
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-        {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            animator.SetTrigger("Jump");
-            isGrounded = false;
-            // Play jump sound
-            if (jumpSound != null)
-            {
-                audioSource.PlayOneShot(jumpSound);
-            }
-        }
-
-        // Punch and Jab
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            animator.SetTrigger("Punch");
-        }
-
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            animator.SetTrigger("Jab");
-        }
-
-        // Rotate character with mouse movement
-        transform.Rotate(Vector3.up, Input.GetAxis("Mouse X") * sensitivity);
-
-        // Rotate camera vertically
-        rotationX -= Input.GetAxis("Mouse Y") * sensitivity;
-        rotationX = Mathf.Clamp(rotationX, -maxYAngle, maxYAngle);
-        Camera.main.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
     }
 
-    void FixedUpdate()
+    private void PerformMovement()
     {
-        // Movement using Rigidbody for collision detection
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
         Vector3 movementDirection = new Vector3(horizontal, 0.0f, vertical).normalized;
@@ -103,11 +77,48 @@ public class CharacterController3D : MonoBehaviour
         if (movementDirection.magnitude > 0)
         {
             Vector3 movement = transform.TransformDirection(movementDirection) * currentSpeed * Time.fixedDeltaTime;
-            rb.MovePosition(rb.position + movement);
+            // Check for collision before moving
+            if (!Physics.Raycast(transform.position, movement, collisionCheckDistance))
+            {
+                rb.MovePosition(rb.position + movement);
+            }
         }
     }
 
-    // Check if the character is grounded
+    private void HandleJump()
+    {
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+        {
+            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            animator.SetTrigger("Jump");
+            isGrounded = false;
+            if (jumpSound != null)
+            {
+                audioSource.PlayOneShot(jumpSound);
+            }
+        }
+    }
+
+    private void HandleCombat()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            animator.SetTrigger("Punch");
+        }
+        if (Input.GetKeyDown(KeyCode.G))
+        {
+            animator.SetTrigger("Jab");
+        }
+    }
+
+    private void HandleRotation()
+    {
+        transform.Rotate(Vector3.up, Input.GetAxis("Mouse X") * sensitivity);
+        rotationX -= Input.GetAxis("Mouse Y") * sensitivity;
+        rotationX = Mathf.Clamp(rotationX, -maxYAngle, maxYAngle);
+        Camera.main.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+    }
+
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
