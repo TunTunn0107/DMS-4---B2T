@@ -9,6 +9,7 @@ public class CharacterController3D : MonoBehaviour
     public float maxYAngle = 80.0f; // Maximum vertical angle to look up and down
     public AudioClip jumpSound;
     public AudioClip walkingSound;
+    public AudioClip runningSound; // Added running sound
 
     private Rigidbody rb;
     private Animator animator;
@@ -53,11 +54,20 @@ public class CharacterController3D : MonoBehaviour
         float currentSpeed = isRunning ? speed * runMultiplier : speed;
 
         bool isMoving = movementDirection.magnitude > 0;
-        animator.SetBool("Walk", isMoving);
+        animator.SetBool("Walk", isMoving && !isRunning);
+        animator.SetBool("Run", isRunning && isMoving); // Optional: add running animation
 
+        // Handle walking and running sounds
         if (isMoving && !audioSource.isPlaying)
         {
-            audioSource.clip = walkingSound;
+            if (isRunning)
+            {
+                audioSource.clip = runningSound;
+            }
+            else
+            {
+                audioSource.clip = walkingSound;
+            }
             audioSource.Play();
         }
         else if (!isMoving)
