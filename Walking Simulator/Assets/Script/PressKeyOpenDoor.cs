@@ -1,7 +1,6 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 
 public class PressKeyOpenDoor : MonoBehaviour
 {
@@ -14,7 +13,7 @@ public class PressKeyOpenDoor : MonoBehaviour
     void Start()
     {
         Instruction.SetActive(false);
-
+        ThisTrigger.GetComponent<BoxCollider>().enabled = true;
     }
 
     void OnTriggerEnter(Collider collision)
@@ -32,7 +31,6 @@ public class PressKeyOpenDoor : MonoBehaviour
         Action = false;
     }
 
-
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.E))
@@ -41,13 +39,10 @@ public class PressKeyOpenDoor : MonoBehaviour
             {
                 Instruction.SetActive(false);
                 AnimeObject.GetComponent<Animator>().Play("DoorOpen");
-                ThisTrigger.SetActive(false);
+                ThisTrigger.GetComponent<BoxCollider>().enabled = false;
                 DoorOpenSound.Play();
                 Action = false;
             }
         }
-
     }
 }
-
-

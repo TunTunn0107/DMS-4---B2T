@@ -9,7 +9,7 @@ public class CharacterController3D : MonoBehaviour
     public float maxYAngle = 80.0f; // Maximum vertical angle to look up and down
     public AudioClip jumpSound;
     public AudioClip walkingSound;
-    public AudioClip runningSound; // Added running sound
+    public AudioClip runningSound;
 
     private Rigidbody rb;
     private Animator animator;
@@ -17,6 +17,7 @@ public class CharacterController3D : MonoBehaviour
     private float rotationX = 0; // Current rotation around the x-axis (pitch)
     private AudioSource audioSource;
     public float collisionCheckDistance = 0.5f; // Distance to check for collision ahead
+    public Transform cameraTransform; // Assign this in Unity's inspector
 
     void Start()
     {
@@ -52,7 +53,6 @@ public class CharacterController3D : MonoBehaviour
 
         bool isRunning = Input.GetKey(KeyCode.LeftShift);
         float currentSpeed = isRunning ? speed * runMultiplier : speed;
-
         bool isMoving = movementDirection.magnitude > 0;
         animator.SetBool("Walk", isMoving && !isRunning);
         //animator.SetBool("Run", isRunning && isMoving); // Optional: add running animation
@@ -87,7 +87,6 @@ public class CharacterController3D : MonoBehaviour
         if (movementDirection.magnitude > 0)
         {
             Vector3 movement = transform.TransformDirection(movementDirection) * currentSpeed * Time.fixedDeltaTime;
-            // Check for collision before moving
             if (!Physics.Raycast(transform.position, movement, collisionCheckDistance))
             {
                 rb.MovePosition(rb.position + movement);
@@ -123,10 +122,16 @@ public class CharacterController3D : MonoBehaviour
 
     private void HandleRotation()
     {
-        transform.Rotate(Vector3.up, Input.GetAxis("Mouse X") * sensitivity);
-        rotationX -= Input.GetAxis("Mouse Y") * sensitivity;
+        float mouseX = Input.GetAxis("Mouse X") * sensitivity;
+        float mouseY = Input.GetAxis("Mouse Y") * sensitivity;
+
+        // Yaw rotation (left and right)
+        transform.Rotate(Vector3.up * mouseX);
+
+        // Pitch rotation (up and down)
+        rotationX -= mouseY;
         rotationX = Mathf.Clamp(rotationX, -maxYAngle, maxYAngle);
-        Camera.main.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
+        cameraTransform.localRotation = Quaternion.Euler(rotationX, 0, 0);
     }
 
     void OnCollisionEnter(Collision collision)

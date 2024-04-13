@@ -6,11 +6,13 @@ TagManager:
   tags:
   - door
   - Ground
+  - trackopen
+  - triggerdoor
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Trigger
   - Water
   - UI
   - 
