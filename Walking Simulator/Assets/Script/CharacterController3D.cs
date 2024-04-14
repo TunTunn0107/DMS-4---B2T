@@ -4,7 +4,7 @@ public class CharacterController3D : MonoBehaviour
 {
     public float speed = 5.0f;
     public float runMultiplier = 2.0f; // The multiplier for running speed
-    public float jumpForce = 5.0f;
+    public float jumpForce = 4.0f;
     public float sensitivity = 2.0f; // Mouse sensitivity for looking around
     public float maxYAngle = 80.0f; // Maximum vertical angle to look up and down
     public AudioClip jumpSound;

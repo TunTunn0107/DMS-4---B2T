@@ -10,6 +10,7 @@ public class TakeItems : MonoBehaviour
     public GameObject TextDrop;
     public Camera playerCamera; // Camera from which to cast rays
     public float rayDistance = 5.0f; // Maximum distance for raycast
+    private bool isHoldingItem = false; // Track if the item is currently held
 
     // Start is called before the first frame update
     void Start()
@@ -21,7 +22,10 @@ public class TakeItems : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        HandleRaycasting();
+        if (!isHoldingItem) // Only perform raycasting if not holding an item
+        {
+            HandleRaycasting();
+        }
         HandleInput();
     }
 
@@ -48,21 +52,21 @@ public class TakeItems : MonoBehaviour
     }
 
     private void HandleInput()
-{
-    if (Input.GetKey(KeyCode.T))  // Corrected from Getkey to GetKey
     {
-        Drop();
-        Text.SetActive(false);
-        TextDrop.SetActive(false);  // Added missing semicolon here
-    }
+        if (Input.GetKey(KeyCode.Q))  // Handle 'Drop'
+        {   
+            Drop();
+            Text.SetActive(false);
+            TextDrop.SetActive(false);
+        }
 
-    if (Input.GetKey(KeyCode.R))  // Handle 'Take' separately
-    {
-        Take();
-        TextDrop.SetActive(true);
+        if (Input.GetKey(KeyCode.R) && Text.activeSelf)  // Handle 'Take' only if raycast detects the item
+        {   
+            Take();
+            Text.SetActive(false);
+            TextDrop.SetActive(true);
+        }
     }
-}
-
 
     void Drop()
     {
@@ -70,17 +74,16 @@ public class TakeItems : MonoBehaviour
         Items.transform.eulerAngles = new Vector3(0, 0, 0);  // Reset rotation
         Items.GetComponent<Rigidbody>().isKinematic = false;
         Items.GetComponent<MeshCollider>().enabled = true;
+        isHoldingItem = false; // Item is no longer held
     }
 
     void Take()
     {   
-        if (Text.activeSelf) // Only take if Text is active, indicating raycast hit
-        {
-            Items.GetComponent<Rigidbody>().isKinematic = true;
-            Items.transform.position = ItemsParent.transform.position;
-            Items.transform.rotation = ItemsParent.transform.rotation;
-            Items.GetComponent<MeshCollider>().enabled = false;
-            Items.transform.SetParent(ItemsParent);
-        }
+        Items.GetComponent<Rigidbody>().isKinematic = true;
+        Items.transform.position = ItemsParent.transform.position;
+        Items.transform.rotation = ItemsParent.transform.rotation;
+        Items.GetComponent<MeshCollider>().enabled = false;
+        Items.transform.SetParent(ItemsParent);
+        isHoldingItem = true; // Item is now held
     }
 }
