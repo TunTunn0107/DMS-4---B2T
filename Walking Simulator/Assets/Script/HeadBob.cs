@@ -4,9 +4,17 @@ public class HeadBob : MonoBehaviour
 {
     public float bobbingSpeed = 0.18f;
     public float bobbingAmount = 0.2f;
-    public float midpoint = 1.8f;
+    public Vector3 midpoint = new Vector3(0.0f, 2.0f, 0.0f);
 
     private float timer = 0.0f;
+    private Transform cameraTransform;
+    private Vector3 originalLocalPosition;
+
+    void Awake()
+    {
+        cameraTransform = GetComponent<Transform>();
+        originalLocalPosition = cameraTransform.localPosition;
+    }
 
     void Update()
     {
@@ -14,7 +22,7 @@ public class HeadBob : MonoBehaviour
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
-        Vector3 cSharpConversion = transform.localPosition;
+        Vector3 localPosition = cameraTransform.localPosition;
 
         if (Mathf.Abs(horizontal) == 0 && Mathf.Abs(vertical) == 0)
         {
@@ -23,25 +31,27 @@ public class HeadBob : MonoBehaviour
         else
         {
             waveslice = Mathf.Sin(timer);
-            timer = timer + bobbingSpeed;
+            timer += bobbingSpeed;
             if (timer > Mathf.PI * 2)
             {
-                timer = timer - (Mathf.PI * 2);
+                timer -= (Mathf.PI * 2);
             }
         }
+
         if (waveslice != 0)
         {
-            float translateChange = waveslice * bobbingAmount;
+            Vector3 translateChange = new Vector3(0, waveslice * bobbingAmount, 0);
             float totalAxes = Mathf.Abs(horizontal) + Mathf.Abs(vertical);
             totalAxes = Mathf.Clamp(totalAxes, 0.0f, 1.0f);
-            translateChange = totalAxes * translateChange;
-            cSharpConversion.y = midpoint + translateChange;
+            translateChange *= totalAxes;
+
+            localPosition.y = midpoint.y + translateChange.y;
         }
         else
         {
-            cSharpConversion.y = midpoint;
+            localPosition.y = midpoint.y;
         }
 
-        transform.localPosition = cSharpConversion;
+        cameraTransform.localPosition = new Vector3(midpoint.x, localPosition.y, midpoint.z);
     }
 }

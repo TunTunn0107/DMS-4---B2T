@@ -3193,9 +3193,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 627a465ce64880d488e972fab31df0b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bobbingSpeed: 0.04
-  bobbingAmount: 0.035
-  midpoint: 0
+  bobbingSpeed: 0.025
+  bobbingAmount: 0.025
+  midpoint: {x: 0, y: 0, z: 0}
 --- !u!114 &944186800
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26291,8 +26291,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.68, y: 1.0417902, z: 1.672845}
-  m_Center: {x: 0.016966201, y: 0.45065817, z: -0.89145476}
+  m_Size: {x: 0.900001, y: 1.1739259, z: 1.672845}
+  m_Center: {x: 0.016966214, y: 0.3845921, z: -0.89145476}
 --- !u!114 &6074807855483457163
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -30340,8 +30340,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.68, y: 1.0417901, z: 1.6728449}
-  m_Center: {x: 0.016966205, y: -0.60213596, z: -0.89527756}
+  m_Size: {x: 0.900001, y: 1.1835829, z: 1.6728448}
+  m_Center: {x: 0.016966213, y: -0.53124106, z: -0.8952777}
 --- !u!114 &7115897730698147346
 MonoBehaviour:
   m_ObjectHideFlags: 0
