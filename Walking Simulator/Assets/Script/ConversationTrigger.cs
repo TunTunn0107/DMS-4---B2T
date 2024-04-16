@@ -2,47 +2,45 @@ using Fungus;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI; // Needed for manipulating UI Text
 
 public class ConversationTrigger : MonoBehaviour
-{   
-    public Flowchart Flowchart; // Reference to the Flowchart component
-    public Text dialoguePrompt; // UI Text to display the "Press T to talk" message
-    public float maxDistance = 5.0f; // Maximum distance for the raycast
+{
+    public Flowchart flowchart; // Reference to the Flowchart component for dialogues
+    public GameObject textGameObject; // Reference to the GameObject that contains the text component
+    public float maxDistance = 5.0f; // Maximum distance for interaction, adjustable from the Unity Inspector
 
-    private bool playerInRange = false;
+    private bool playerInRange = false; // Flag to check if the player is in range to talk
 
-    private void Start()
-    {
-        dialoguePrompt.gameObject.SetActive(false); // Hide the text at start
-    }
-
-    private void Update()
-    {
-        RaycastForPlayer();
-        if (playerInRange && Input.GetKeyDown(KeyCode.T))
-        {
-            Flowchart.ExecuteBlock("Sarah Talk");
-            dialoguePrompt.gameObject.SetActive(false); // Optionally hide the prompt after starting the conversation
-        }
-    }
-
-    private void RaycastForPlayer()
+    void Update()
     {
         RaycastHit hit;
-        Vector3 fwd = transform.TransformDirection(Vector3.forward);
+        Vector3 forward = transform.TransformDirection(Vector3.forward) * maxDistance;
 
-        if (Physics.Raycast(transform.position, fwd, out hit, maxDistance))
+        // Debug raycast in the scene view
+        Debug.DrawRay(transform.position, forward, Color.green);
+
+        // Perform the raycast
+        if (Physics.Raycast(transform.position, transform.forward, out hit, maxDistance))
         {
-            if (hit.collider.gameObject.CompareTag("Player")) // Make sure to tag your player GameObject with the tag "Player"
+            // Check if the hit object is the player
+            if (hit.collider.CompareTag("Player"))
             {
-                dialoguePrompt.gameObject.SetActive(true);
-                playerInRange = true;
-                return;
+                if (!playerInRange)
+                {
+                    playerInRange = true;
+                    textGameObject.SetActive(true); // Show the interactive text
+                }
+
+                if (Input.GetKeyDown(KeyCode.T))
+                {
+                    flowchart.ExecuteBlock("Sarah Talk"); // Execute the conversation block when T is pressed
+                }
             }
         }
-
-        dialoguePrompt.gameObject.SetActive(false);
-        playerInRange = false;
+        else if (playerInRange)
+        {
+            playerInRange = false;
+            textGameObject.SetActive(false); // Hide the text when the player is out of range
+        }
     }
 }

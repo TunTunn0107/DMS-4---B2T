@@ -2,21 +2,14 @@ using UnityEngine;
 
 public class CharacterController3D : MonoBehaviour
 {
-    public float speed = 5.0f;
-    public float runMultiplier = 2.0f; // The multiplier for running speed
-    public float jumpForce = 4.0f;
+    public float speed = 5.0f; // Walking speed
     public float sensitivity = 2.0f; // Mouse sensitivity for looking around
     public float maxYAngle = 80.0f; // Maximum vertical angle to look up and down
-    public AudioClip jumpSound;
     public AudioClip walkingSound;
-    public AudioClip runningSound;
 
     private Rigidbody rb;
     private Animator animator;
-    private bool isGrounded;
-    private float rotationX = 0; // Current rotation around the x-axis (pitch)
     private AudioSource audioSource;
-    public float collisionCheckDistance = 0.5f; // Distance to check for collision ahead
     public Transform cameraTransform; // Assign this in Unity's inspector
 
     void Start()
@@ -35,8 +28,6 @@ public class CharacterController3D : MonoBehaviour
     void Update()
     {
         HandleMovement();
-        HandleJump();
-        HandleCombat();
         HandleRotation();
     }
 
@@ -50,24 +41,14 @@ public class CharacterController3D : MonoBehaviour
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
         Vector3 movementDirection = new Vector3(horizontal, 0.0f, vertical).normalized;
-
-        bool isRunning = Input.GetKey(KeyCode.LeftShift);
-        float currentSpeed = isRunning ? speed * runMultiplier : speed;
+        float currentSpeed = speed;
         bool isMoving = movementDirection.magnitude > 0;
-        animator.SetBool("Walk", isMoving && !isRunning);
-        animator.SetBool("Run", isRunning && isMoving); // Ensure this line is uncommented
+        animator.SetBool("Walk", isMoving); // Ensure this line is uncommented
 
-        // Handle walking and running sounds
+        // Handle walking sound
         if (isMoving && !audioSource.isPlaying)
         {
-            if (isRunning)
-            {
-                audioSource.clip = runningSound;
-            }
-            else
-            {
-                audioSource.clip = walkingSound;
-            }
+            audioSource.clip = walkingSound;
             audioSource.Play();
         }
         else if (!isMoving)
@@ -81,42 +62,12 @@ public class CharacterController3D : MonoBehaviour
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
         Vector3 movementDirection = new Vector3(horizontal, 0.0f, vertical).normalized;
-        bool isRunning = Input.GetKey(KeyCode.LeftShift);
-        float currentSpeed = isRunning ? speed * runMultiplier : speed;
+        float currentSpeed = speed;
 
         if (movementDirection.magnitude > 0)
         {
             Vector3 movement = transform.TransformDirection(movementDirection) * currentSpeed * Time.fixedDeltaTime;
-            if (!Physics.Raycast(transform.position, movement, collisionCheckDistance))
-            {
-                rb.MovePosition(rb.position + movement);
-            }
-        }
-    }
-
-    private void HandleJump()
-    {
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-        {
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-            animator.SetTrigger("Jump");
-            isGrounded = false;
-            if (jumpSound != null)
-            {
-                audioSource.PlayOneShot(jumpSound);
-            }
-        }
-    }
-
-    private void HandleCombat()
-    {
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            animator.SetTrigger("Punch");
-        }
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            animator.SetTrigger("Jab");
+            rb.MovePosition(rb.position + movement);
         }
     }
 
@@ -129,24 +80,11 @@ public class CharacterController3D : MonoBehaviour
         transform.Rotate(Vector3.up * mouseX);
 
         // Pitch rotation (up and down)
-        rotationX -= mouseY;
+        cameraTransform.localEulerAngles += new Vector3(-mouseY, 0, 0);
+        float rotationX = cameraTransform.localEulerAngles.x;
+        // Clamping the X rotation to stay within maxYAngle
+        if (rotationX > 180) rotationX -= 360; // Adjust rotation values going over 180 degrees
         rotationX = Mathf.Clamp(rotationX, -maxYAngle, maxYAngle);
         cameraTransform.localRotation = Quaternion.Euler(rotationX, 0, 0);
-    }
-
-    void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            isGrounded = true;
-        }
-    }
-
-    void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.CompareTag("Ground"))
-        {
-            isGrounded = false;
-        }
     }
 }
