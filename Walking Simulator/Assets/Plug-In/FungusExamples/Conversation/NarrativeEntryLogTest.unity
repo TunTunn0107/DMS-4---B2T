@@ -3815,7 +3815,7 @@ MonoBehaviour:
 
     Saevam iram, iram et dolorem
 
-    
+
 
     Sephiroth,
     Sephiroth'
@@ -3850,12 +3850,12 @@ MonoBehaviour:
     Noli manere, manare in memoria
     Sephiroth, Sephiroth Saevam iram, iram et dolorem
 
-    Saevam iram, iram et
-    dolorem
+    Saevam iram, iram et dolorem
 
-    
 
-    Sephiroth, Sephiroth'
+
+    Sephiroth,
+    Sephiroth'
   description: 
   character: {fileID: 2072580810}
   portrait: {fileID: 0}
